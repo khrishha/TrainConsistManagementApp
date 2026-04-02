@@ -4,16 +4,21 @@ public class TrainConsistManagementApp {
     public static void main(String[] args) {
 
         System.out.println("=== Train Consist Management App ===");
-        System.out.println("UC3: Track Unique Bogie IDs");
+        System.out.println("UC4: Maintain Ordered Bogie IDs");
 
-        Set<String> bogieIds = new HashSet<>();
+        LinkedList<String> trainConsist = new LinkedList<>();
 
-        bogieIds.add("BG101");
-        bogieIds.add("BG102");
-        bogieIds.add("BG103");
-        bogieIds.add("BG101"); // duplicate
-        bogieIds.add("BG102"); // duplicate
+        trainConsist.add("Engine");
+        trainConsist.add("Sleeper");
+        trainConsist.add("AC");
+        trainConsist.add("Cargo");
+        trainConsist.add("Guard");
 
-        System.out.println("Unique Bogie IDs: " + bogieIds);
+        trainConsist.add(2, "Pantry Car");
+
+        trainConsist.removeFirst();
+        trainConsist.removeLast();
+
+        System.out.println("Final Train Consist: " + trainConsist);
     }
 }
