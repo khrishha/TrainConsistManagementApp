@@ -1,40 +1,47 @@
 package main;
 
-// Custom Exception Class
-class InvalidCapacityException extends Exception {
-    public InvalidCapacityException(String message) {
+// 1. Define the Custom Runtime Exception
+class CargoSafetyException extends Exception {
+    public CargoSafetyException(String message) {
         super(message);
     }
 }
 
-public class UseCase14TrainConsistMgmnt {
+public class UseCase15TrainConsistMgmnt {
 
-    public static class Bogie {
-        private String type;
-        private int capacity;
+    public static class GoodsBogie {
+        String type;
+        String cargo = "Empty";
 
-        public Bogie(String type, int capacity) throws InvalidCapacityException {
-            // Business Rule Validation
-            if (capacity <= 0) {
-                throw new InvalidCapacityException("Capacity must be greater than zero");
+        public GoodsBogie(String type) { this.type = type; }
+
+        // 2. Logic to assign cargo with safety checks
+        public void assignCargo(String newCargo) throws CargoSafetyException {
+            if (type.equalsIgnoreCase("Rectangular") && newCargo.equalsIgnoreCase("Petroleum")) {
+                throw new CargoSafetyException("Safety Alert: Rectangular bogies cannot carry Petroleum!");
             }
-            this.type = type;
-            this.capacity = capacity;
+            this.cargo = newCargo;
         }
 
-        public int getCapacity() { return capacity; }
+        public String getCargo() { return cargo; }
     }
 
     public static void main(String[] args) {
-        try {
-            System.out.println("Attempting to create a valid bogie...");
-            Bogie validBogie = new Bogie("Sleeper", 72);
-            System.out.println("Success! Capacity: " + validBogie.getCapacity());
+        GoodsBogie rectBogie = new GoodsBogie("Rectangular");
 
-            System.out.println("\nAttempting to create an invalid bogie...");
-            Bogie invalidBogie = new Bogie("AC Chair", -5); // This will throw exception
-        } catch (InvalidCapacityException e) {
-            System.err.println("Caught Expected Error: " + e.getMessage());
+        // 3. Structured Exception Handling
+        try {
+            System.out.println("Action: Attempting to assign Petroleum to Rectangular bogie...");
+            rectBogie.assignCargo("Petroleum");
+            System.out.println("Cargo assigned successfully.");
+        } catch (CargoSafetyException e) {
+            // 4. Handle the error without crashing
+            System.err.println("Handled Error: " + e.getMessage());
+        } finally {
+            // 5. Always execute cleanup/logging
+            System.out.println("System: Cargo validation check completed.");
         }
+
+        System.out.println("\nStatus: Program is still running. Next task can proceed...");
     }
 }
