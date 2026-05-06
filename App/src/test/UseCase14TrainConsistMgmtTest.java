@@ -1,39 +1,57 @@
 package test;
 
-import main.UseCase14TrainConsistMgmnt.Bogie;
-import main.InvalidCapacityException;
+import main.UseCase15TrainConsistMgmnt.GoodsBogie;
+import main.CargoSafetyException;
+
+
+
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UseCase14TrainConsistMgmntTest {
+public class UseCase15TrainConsistMgmntTest {
 
     @Test
-    void testException_ValidCapacityCreation() {
-        // Verifies that positive capacity works without issues
-        assertDoesNotThrow(() -> new Bogie("Sleeper", 72));
+    void testCargo_SafeAssignment() {
+        // Verifies valid combinations work
+        GoodsBogie cylindrical = new GoodsBogie("Cylindrical");
+        assertDoesNotThrow(() -> cylindrical.assignCargo("Petroleum"));
+        assertEquals("Petroleum", cylindrical.getCargo());
     }
 
-    @Test
-    void testException_NegativeCapacityThrowsException() {
-        // Verifies that -10 triggers the custom exception
-        Exception exception = assertThrows(InvalidCapacityException.class, () -> {
-            new Bogie("Sleeper", -10);
-        });
-        assertEquals("Capacity must be greater than zero", exception.getMessage());
-    }
+
+
 
     @Test
-    void testException_ZeroCapacityThrowsException() {
-        // Verifies that 0 is treated as invalid
-        assertThrows(InvalidCapacityException.class, () -> {
-            new Bogie("Sleeper", 0);
+    void testCargo_UnsafeAssignmentHandled() {
+        // Verifies that the exception is thrown for unsafe combinations
+        GoodsBogie rectangular = new GoodsBogie("Rectangular");
+        assertThrows(CargoSafetyException.class, () -> {
+            rectangular.assignCargo("Petroleum");
         });
     }
 
     @Test
-    void testException_ObjectIntegrityAfterCreation() throws InvalidCapacityException {
-        // Verifies data is stored correctly if validation passes
-        Bogie b = new Bogie("First Class", 24);
-        assertEquals(24, b.getCapacity());
+    void testCargo_CargoNotAssignedAfterFailure() {
+        // Verifies that the state doesn't change if an exception occurs
+        GoodsBogie rectangular = new GoodsBogie("Rectangular");
+        try {
+            rectangular.assignCargo("Petroleum");
+        } catch (CargoSafetyException e) {
+            // Exception caught
+        }
+        assertEquals("Empty", rectangular.getCargo(), "Cargo should remain 'Empty' after failed assignment");
+    }
+
+    @Test
+    void testCargo_ProgramContinuesAfterException() {
+        // Simulates handling an error and continuing to a second valid task
+        GoodsBogie b1 = new GoodsBogie("Rectangular");
+        GoodsBogie b2 = new GoodsBogie("Cylindrical");
+
+        try { b1.assignCargo("Petroleum"); } catch (Exception e) { /* Logged */ }
+        
+        assertDoesNotThrow(() -> b2.assignCargo("Petroleum"));
+        assertEquals("Petroleum", b2.getCargo());
     }
 }
